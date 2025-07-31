@@ -3,8 +3,6 @@ import { AuthProvider } from './context/AuthContext';
 import Navigation from './components/Navigation';
 import AppRoutes from './AppRoutes';
 import ErrorBoundary from './ErrorBoundary';
-import './styles/global.css';
-import SummaryDashboard  from './components/SummaryDashboard';
 
 function App() {
   return (
