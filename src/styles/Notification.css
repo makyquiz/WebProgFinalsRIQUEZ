@@ -1,4 +1,3 @@
-/* styles/Notification.css */
 .notification {
   position: fixed;
   top: 20px;
@@ -17,19 +16,19 @@
 }
 
 .notification.success {
-  background-color: #4CAF50; /* Green */
+  background-color: #4CAF50; 
 }
 
 .notification.error {
-  background-color: #F44336; /* Red */
+  background-color: #F44336; 
 }
 
 .notification.warning {
-  background-color: #FF9800; /* Orange */
+  background-color: #FF9800; 
 }
 
 .notification.info {
-  background-color: #2196F3; /* Blue */
+  background-color: #2196F3;
 }
 
 .close-btn {
@@ -72,7 +71,6 @@
   animation: slideOut 0.3s ease-in forwards;
 }
 
-/* Responsive adjustments */
 @media (max-width: 600px) {
   .notification {
     top: 10px;

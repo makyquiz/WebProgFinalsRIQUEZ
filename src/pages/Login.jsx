@@ -18,7 +18,6 @@ function Login() {
       setError('');
       setLoading(true);
       
-      // Basic client-side validation
       if (!email || !password) {
         throw new Error('Please fill in all fields');
       }

@@ -15,7 +15,6 @@ function App() {
               <AppRoutes />
             </ErrorBoundary>
           </main>
-          {/* Add footer here if needed */}
         </div>
       </AuthProvider>
     </Router>

@@ -16,7 +16,6 @@ export function AuthProvider({ children }) {
 
   async function signup(email, password) {
     try {
-      // First check if email exists
       const methods = await fetchSignInMethodsForEmail(auth, email);
       if (methods && methods.length > 0) {
         throw new Error('Email already in use');
@@ -32,7 +31,6 @@ export function AuthProvider({ children }) {
 
   async function login(email, password) {
     try {
-      // Validate email format first
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         throw new Error('Please enter a valid email address');
       }
@@ -49,7 +47,6 @@ export function AuthProvider({ children }) {
     return signOut(auth);
   }
 
-  // Helper function to format Firebase errors
   function formatAuthError(error) {
     switch (error.code) {
       case 'auth/invalid-email':

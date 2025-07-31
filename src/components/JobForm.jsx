@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import Notification from './Notification';
 import '../styles/JobForm.css';
 
-// Format date to "yyyy-MM-ddTHH:mm" for datetime-local input
 const formatDateTime = (date) => {
   return new Date(date).toISOString().slice(0, 16);
 };

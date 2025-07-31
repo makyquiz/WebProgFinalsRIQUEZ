@@ -1,4 +1,3 @@
-// components/Notification.jsx
 import { useEffect } from 'react';
 import '../styles/Notification.css';
 

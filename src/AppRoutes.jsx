@@ -10,11 +10,9 @@ import SummaryDashboard from './components/SummaryDashboard'; // Add this import
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      
-      {/* Protected Routes */}
+
       <Route path="/" element={
         <PrivateRoute>
           <Dashboard />
@@ -25,7 +23,6 @@ const AppRoutes = () => {
         <Route path="jobs" element={<JobList />} />
       </Route>
       
-      {/* Catch-all Route */}
       <Route path="*" element={
         <PrivateRoute>
           <Dashboard />
