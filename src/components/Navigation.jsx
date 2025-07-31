@@ -1,27 +1,62 @@
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useState } from 'react';
+import '../styles/Navigation.css';
 
 const Navigation = () => {
   const { currentUser, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="main-navigation">
-      <div className="nav-brand">
-        <Link to="/">FreelancerIN</Link>
-      </div>
-      
-      <div className="nav-links">
-        {currentUser ? (
+    <nav className="navbar">
+      <div className="nav-container">
+        <Link to="/" className="nav-brand">FreelancerIN</Link>
+        
+        {currentUser && (
           <>
-            <Link to="/dashboard">Dashboard</Link>
-            <Link to="/add-job">Add Job</Link>
-            <Link to="/jobs">My Jobs</Link>
-            <button onClick={logout} className="nav-logout">Logout</button>
-          </>
-        ) : (
-          <>
-            <Link to="/login">Login</Link>
-            <Link to="/signup">Sign Up</Link>
+            <button 
+              className="menu-toggle"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+            >
+              ☰
+            </button>
+            
+            <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
+              <NavLink 
+                to="/dashboard" 
+                className="nav-link"
+                onClick={() => setMenuOpen(false)}
+              >
+                Dashboard
+              </NavLink>
+              
+              <NavLink 
+                to="/add-job" 
+                className="nav-link"
+                onClick={() => setMenuOpen(false)}
+              >
+                Add Job
+              </NavLink>
+              
+              <NavLink 
+                to="/jobs" 
+                className="nav-link"
+                onClick={() => setMenuOpen(false)}
+              >
+                My Jobs
+              </NavLink>
+              
+              <button 
+                onClick={() => {
+                  logout();
+                  setMenuOpen(false);
+                }} 
+                className="nav-logout"
+              >
+                Logout
+              </button>
+            </div>
           </>
         )}
       </div>

@@ -1,5 +1,6 @@
+// Dashboard.jsx
 import { useState, useEffect } from 'react';
-import { collection, query, onSnapshot } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../context/AuthContext';
 import { Outlet } from 'react-router-dom';
@@ -13,7 +14,7 @@ const Dashboard = () => {
     if (!currentUser?.uid) return;
 
     const jobsRef = collection(db, 'users', currentUser.uid, 'jobs');
-    const q = query(jobsRef);
+    const q = query(jobsRef, orderBy('createdAt', 'desc')); // Add sorting
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const jobsData = snapshot.docs.map(doc => {
@@ -21,7 +22,6 @@ const Dashboard = () => {
         return {
           id: doc.id,
           ...data,
-          // Convert ALL Firestore timestamps
           date: data.date?.toDate?.() || null,
           createdAt: data.createdAt?.toDate?.() || null
         };
@@ -29,14 +29,14 @@ const Dashboard = () => {
       setJobs(jobsData);
       setLoading(false);
     }, (error) => {
-      console.error("Firestore error:", error);
+      console.error("Error fetching jobs:", error);
       setLoading(false);
     });
 
-    return unsubscribe;
+    return () => unsubscribe();
   }, [currentUser?.uid]);
 
-  if (loading) return <div>Loading jobs...</div>;
+  if (loading) return <div className="loading-spinner">Loading...</div>;
 
   return (
     <div className="dashboard">
