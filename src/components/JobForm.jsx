@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../context/AuthContext';
 import Notification from './Notification';
@@ -7,14 +7,19 @@ import '../styles/JobForm.css';
 
 const JobForm = () => {
   const { currentUser } = useAuth();
+  const today = new Date().toISOString().split('T')[0];
+
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
+    date: today,
     client: '',
     title: '',
     amount: '',
     status: 'pending',
-    notes: ''
+    notes: '',
+    startDate: today,
+    deadlineDate: today,
   });
+
   const [notification, setNotification] = useState(null);
 
   const handleSubmit = async (e) => {
@@ -27,30 +32,33 @@ const JobForm = () => {
       await addDoc(collection(db, 'users', currentUser.uid, 'jobs'), {
         ...formData,
         amount: parseFloat(formData.amount),
-        date: serverTimestamp(),
+        date: Timestamp.fromDate(new Date(formData.date)),
+        startDate: Timestamp.fromDate(new Date(formData.startDate)),
+        deadlineDate: Timestamp.fromDate(new Date(formData.deadlineDate)),
         createdAt: serverTimestamp()
       });
 
-      setNotification({ 
-        message: 'Job added successfully!', 
-        type: 'success' 
+      setNotification({
+        message: 'Job added successfully!',
+        type: 'success'
       });
 
-      // Reset form
       setFormData({
-        date: new Date().toISOString().split('T')[0],
+        date: today,
         client: '',
         title: '',
         amount: '',
         status: 'pending',
-        notes: ''
+        notes: '',
+        startDate: today,
+        deadlineDate: today,
       });
 
     } catch (error) {
       console.error('Error adding job:', error);
-      setNotification({ 
-        message: error.message || 'Failed to add job', 
-        type: 'error' 
+      setNotification({
+        message: error.message || 'Failed to add job',
+        type: 'error'
       });
     }
   };
@@ -76,7 +84,7 @@ const JobForm = () => {
       <h2>Add New Job</h2>
       <form onSubmit={handleSubmit} className="job-form">
         <div className="form-group">
-          <label htmlFor="date">Date</label>
+          <label htmlFor="date">Job Creation Date</label>
           <input
             id="date"
             type="date"
@@ -86,7 +94,31 @@ const JobForm = () => {
             required
           />
         </div>
-        
+
+        <div className="form-group">
+          <label htmlFor="startDate">Start Date</label>
+          <input
+            id="startDate"
+            type="date"
+            name="startDate"
+            value={formData.startDate}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="deadlineDate">Deadline Date</label>
+          <input
+            id="deadlineDate"
+            type="date"
+            name="deadlineDate"
+            value={formData.deadlineDate}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
         <div className="form-group">
           <label htmlFor="client">Client Name</label>
           <input
@@ -99,7 +131,7 @@ const JobForm = () => {
             placeholder="Enter client name"
           />
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="title">Job Title</label>
           <input
@@ -112,9 +144,9 @@ const JobForm = () => {
             placeholder="Enter job title"
           />
         </div>
-        
+
         <div className="form-group">
-          <label htmlFor="amount">Amount ($)</label>
+          <label htmlFor="amount">Amount (₱)</label>
           <input
             id="amount"
             type="number"
@@ -127,7 +159,7 @@ const JobForm = () => {
             placeholder="0.00"
           />
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="status">Status</label>
           <select
@@ -140,7 +172,7 @@ const JobForm = () => {
             <option value="paid">Paid</option>
           </select>
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="notes">Notes</label>
           <textarea
@@ -152,9 +184,9 @@ const JobForm = () => {
             rows="3"
           />
         </div>
-        
-        <button 
-          type="submit" 
+
+        <button
+          type="submit"
           className="submit-btn"
           disabled={!formData.client || !formData.title || !formData.amount}
         >

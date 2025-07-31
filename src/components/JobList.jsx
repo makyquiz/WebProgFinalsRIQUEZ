@@ -61,146 +61,175 @@ const JobList = () => {
         </div>
       ) : (
         <div className="jobs-grid">
-          {sortedJobs.map(job => (
-            <div key={job.id} className={`job-card ${job.status}`}>
-              {editingJob?.id === job.id ? (
-                <div className="edit-form">
-                  <div className="form-group">
-                    <label htmlFor="title">Title:</label>
-                    <input
-                      id="title"
-                      type="text"
-                      value={editingJob.title}
-                      placeholder="Job Title"
-                      onChange={(e) =>
-                        setEditingJob({ ...editingJob, title: e.target.value })
-                      }
-                    />
-                  </div>
+          {sortedJobs.map(job => {
+            const createdAt = job.createdAt ? new Date(job.createdAt.seconds * 1000) : null;
+            const startDate = job.startDate
+              ? new Date(job.startDate.seconds ? job.startDate.seconds * 1000 : job.startDate)
+              : null;
+            const deadline = job.deadlineDate
+              ? new Date(job.deadlineDate.seconds ? job.deadlineDate.seconds * 1000 : job.deadlineDate)
+              : null;
+            return (
+              <div key={job.id} className={`job-card ${job.status}`}>
+                {editingJob?.id === job.id ? (
+                  <div className="edit-form">
+                    <div className="form-group">
+                      <label>Title:</label>
+                      <input
+                        type="text"
+                        value={editingJob.title}
+                        onChange={(e) => setEditingJob({ ...editingJob, title: e.target.value })}
+                      />
+                    </div>
 
-                  <div className="form-group">
-                    <label htmlFor="client">Client:</label>
-                    <input
-                      id="client"
-                      type="text"
-                      value={editingJob.client}
-                      placeholder="Client Name"
-                      onChange={(e) =>
-                        setEditingJob({ ...editingJob, client: e.target.value })
-                      }
-                    />
-                  </div>
+                    <div className="form-group">
+                      <label>Client:</label>
+                      <input
+                        type="text"
+                        value={editingJob.client}
+                        onChange={(e) => setEditingJob({ ...editingJob, client: e.target.value })}
+                      />
+                    </div>
 
-                  <div className="form-group">
-                    <label htmlFor="amount">Amount:</label>
-                    <input
-                      id="amount"
-                      type="number"
-                      value={editingJob.amount}
-                      placeholder="Amount"
-                      onChange={(e) =>
-                        setEditingJob({
-                          ...editingJob,
-                          amount: parseFloat(e.target.value)
-                        })
-                      }
-                    />
-                  </div>
-
-                  <div className="edit-buttons">
-                    <button
-                      onClick={async () => {
-                        try {
-                          await updateDoc(doc(db, 'users', currentUser.uid, 'jobs', job.id), {
-                            title: editingJob.title,
-                            client: editingJob.client,
-                            amount: editingJob.amount,
-                          });
-                          setEditingJob(null);
-                        } catch (error) {
-                          console.error("Error updating job:", error);
+                    <div className="form-group">
+                      <label>Amount:</label>
+                      <input
+                        type="number"
+                        value={editingJob.amount}
+                        onChange={(e) =>
+                          setEditingJob({ ...editingJob, amount: parseFloat(e.target.value) })
                         }
-                      }}
-                    >
-                      Save
-                    </button>
-                    <button onClick={() => setEditingJob(null)}>Cancel</button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="job-header">
-                    <h3>{job.title || 'Untitled Job'}</h3>
-                    <div className="job-actions">
-                      <button onClick={() => setEditingJob(job)} className="edit-btn">
-                        Edit
-                      </button>
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Start Date:</label>
+                      <input
+                        type="date"
+                        value={
+                          editingJob.startDate
+                            ? new Date(
+                                editingJob.startDate.seconds
+                                  ? editingJob.startDate.seconds * 1000
+                                  : editingJob.startDate
+                              ).toISOString().split('T')[0]
+                            : ''
+                        }
+                        onChange={(e) =>
+                          setEditingJob({
+                            ...editingJob,
+                            startDate: new Date(e.target.value)
+                          })
+                        }
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Deadline:</label>
+                      <input
+                        type="date"
+                        value={
+                          editingJob.deadlineDate
+                            ? new Date(
+                                editingJob.deadlineDate.seconds
+                                  ? editingJob.deadlineDate.seconds * 1000
+                                  : editingJob.deadlineDate
+                              ).toISOString().split('T')[0]
+                            : ''
+                        }
+                        onChange={(e) =>
+                          setEditingJob({
+                            ...editingJob,
+                            deadlineDate: new Date(e.target.value)
+                          })
+                        }
+                      />
+                    </div>
+
+                    <div className="edit-buttons">
                       <button
-                        onClick={() => setShowDeleteConfirm(job.id)}
-                        className="delete-btn"
+                        onClick={async () => {
+                          try {
+                            await updateDoc(doc(db, 'users', currentUser.uid, 'jobs', job.id), {
+                              title: editingJob.title,
+                              client: editingJob.client,
+                              amount: editingJob.amount,
+                              startDate: editingJob.startDate,
+                              deadlineDate: editingJob.deadlineDate,
+                            });
+                            setEditingJob(null);
+                          } catch (error) {
+                            console.error("Error updating job:", error);
+                          }
+                        }}
                       >
-                        Delete
+                        Save
                       </button>
+                      <button onClick={() => setEditingJob(null)}>Cancel</button>
                     </div>
                   </div>
-
-                  <p><strong>Client:</strong> {job.client || 'No client specified'}</p>
-                  <p><strong>Amount:</strong> ${job.amount?.toFixed(2)}</p>
-                  <p>
-                    <strong>Status:</strong>
-                    <span className={`status-badge ${job.status}`}>{job.status}</span>
-                  </p>
-
-                  <button
-                    onClick={() => setConfirmStatusChangeId(job.id)}
-                    className={`status-btn ${job.status}`}
-                  >
-                    {job.status === 'paid' ? 'Mark as Pending' : 'Mark as Paid'}
-                  </button>
-
-                  {confirmStatusChangeId === job.id && (
-                    <div className="confirmation-dialog">
-                      <p>
-                        Are you sure you want to mark this job as{' '}
-                        <strong>{job.status === 'paid' ? 'pending' : 'paid'}</strong>?
-                      </p>
-                      <div className="confirmation-buttons">
-                        <button
-                          onClick={() => {
-                            handleStatusToggle(job.id, job.status);
-                            setConfirmStatusChangeId(null);
-                          }}
-                          className="confirm-delete"
-                        >
-                          Confirm
-                        </button>
-                        <button
-                          onClick={() => setConfirmStatusChangeId(null)}
-                          className="cancel-delete"
-                        >
-                          Cancel
-                        </button>
+                ) : (
+                  <>
+                    <div className="job-header">
+                      <h3>{job.title || 'Untitled Job'}</h3>
+                      <div className="job-actions">
+                        <button onClick={() => setEditingJob(job)} className="edit-btn">Edit</button>
+                        <button onClick={() => setShowDeleteConfirm(job.id)} className="delete-btn">Delete</button>
                       </div>
                     </div>
-                  )}
 
-                  {showDeleteConfirm === job.id && (
-                    <div className="confirmation-dialog">
-                      <p>Delete this job permanently?</p>
-                      <div className="confirmation-buttons">
-                        <button onClick={() => handleDelete(job.id)} className="confirm-delete">
-                          Confirm
-                        </button>
-                        <button onClick={() => setShowDeleteConfirm(null)} className="cancel-delete">
-                          Cancel
-                        </button>
+                    <p><strong>Client:</strong> {job.client || 'No client specified'}</p>
+                    <p><strong>Amount:</strong> ₱{job.amount?.toFixed(2)}</p>
+                    <p><strong>Status:</strong> <span className={`status-badge ${job.status}`}>{job.status}</span></p>
+                    {createdAt && <p><strong>Created At:</strong> {createdAt.toLocaleDateString()}</p>}
+                    {startDate && <p><strong>Start Date:</strong> {startDate.toLocaleDateString()}</p>}
+                    {deadline && <p><strong>Deadline:</strong> {deadline.toLocaleDateString()}</p>}
+
+                    <button
+                      onClick={() => setConfirmStatusChangeId(job.id)}
+                      className={`status-btn ${job.status}`}
+                    >
+                      {job.status === 'paid' ? 'Mark as Pending' : 'Mark as Paid'}
+                    </button>
+
+                    {confirmStatusChangeId === job.id && (
+                      <div className="confirmation-dialog">
+                        <p>Are you sure you want to mark this job as <strong>{job.status === 'paid' ? 'pending' : 'paid'}</strong>?</p>
+                        <div className="confirmation-buttons">
+                          <button
+                            onClick={() => {
+                              handleStatusToggle(job.id, job.status);
+                              setConfirmStatusChangeId(null);
+                            }}
+                            className="confirm-delete"
+                          >
+                            Confirm
+                          </button>
+                          <button onClick={() => setConfirmStatusChangeId(null)} className="cancel-delete">
+                            Cancel
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          ))}
+                    )}
+
+                    {showDeleteConfirm === job.id && (
+                      <div className="confirmation-dialog">
+                        <p>Delete this job permanently?</p>
+                        <div className="confirmation-buttons">
+                          <button onClick={() => handleDelete(job.id)} className="confirm-delete">
+                            Confirm
+                          </button>
+                          <button onClick={() => setShowDeleteConfirm(null)} className="cancel-delete">
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

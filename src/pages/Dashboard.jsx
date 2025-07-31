@@ -43,7 +43,6 @@ const Dashboard = () => {
 
   if (loading) return <div className="loading-spinner">Loading...</div>;
 
-  // Metrics
   const totalJobs = jobs.length;
   const paidJobs = jobs.filter(job => job.status === 'paid');
   const pendingJobs = jobs.filter(job => job.status !== 'paid');
@@ -55,21 +54,25 @@ const Dashboard = () => {
         <Outlet context={{ jobs }} />
       ) : (
         <div className="dashboard-summary">
-          <h1 className="text-2xl font-bold mb-4">Welcome to Your Dashboard</h1>
+          <div className="dashboard-header">
+            <h1 className="welcome-text">Welcome back!</h1>
+            <p className="user-email">{currentUser?.email}</p>
+          </div>
+
           <div className="metrics-grid">
-            <div className="metric-card">
+            <div className="metric-card card-blue">
               <h2>Total Jobs</h2>
               <p>{totalJobs}</p>
             </div>
-            <div className="metric-card">
+            <div className="metric-card card-green">
               <h2>Paid Jobs</h2>
               <p>{paidJobs.length}</p>
             </div>
-            <div className="metric-card">
+            <div className="metric-card card-yellow">
               <h2>Pending Jobs</h2>
               <p>{pendingJobs.length}</p>
             </div>
-            <div className="metric-card">
+            <div className="metric-card card-purple">
               <h2>Total Earnings</h2>
               <p>₱{totalEarnings.toFixed(2)}</p>
             </div>

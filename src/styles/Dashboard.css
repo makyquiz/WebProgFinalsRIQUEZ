@@ -1,52 +1,67 @@
 .dashboard-summary {
-  background-color: #1f1f1f;
-  color: white;
-  padding: 2rem;
+  background-color: #f3f4f6;
+  padding: 3rem 1.5rem;
   border-radius: 12px;
-  max-width: 600px;
+  max-width: 1000px;
   margin: 2rem auto;
   text-align: center;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-.dashboard-link {
-  display: inline-block;
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #3b82f6;
-  color: white;
-  border-radius: 6px;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
+.dashboard-header {
+  margin-bottom: 2rem;
 }
 
-.dashboard-link:hover {
-  background-color: #2563eb;
+.welcome-text {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.user-email {
+  font-size: 1rem;
+  color: #6b7280;
 }
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1rem;
-  margin-top: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
 }
 
 .metric-card {
-  background-color: #f9fafb;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  text-align: center;
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-5px);
 }
 
 .metric-card h2 {
   font-size: 1rem;
   font-weight: 600;
   color: #374151;
+  margin-bottom: 0.5rem;
 }
 
 .metric-card p {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: bold;
   color: #111827;
+}
+
+/* Accent color themes */
+.card-blue { border-left: 6px solid #3b82f6; }
+.card-green { border-left: 6px solid #10b981; }
+.card-yellow { border-left: 6px solid #f59e0b; }
+.card-purple { border-left: 6px solid #8b5cf6; }
+
+.loading-spinner {
+  text-align: center;
+  margin-top: 4rem;
+  font-size: 1.25rem;
+  color: #6b7280;
 }
