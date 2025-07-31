@@ -88,14 +88,24 @@ const JobList = () => {
     setShowDeleteConfirm(null);
   };
 
-  const handleStatusToggle = async (jobId, currentStatus) => {
-    try {
-      await updateDoc(doc(db, 'users', currentUser.uid, 'jobs', jobId), {
-        status: currentStatus === 'paid' ? 'pending' : 'paid',
-      });
-    } catch (error) {
-      console.error('Error updating job status:', error);
-    }
+  const updatedJobs = safeJobs.map(job => 
+    job.id === jobId ? { ...job, status: newStatus } : job
+  );
+  // Update the local state immediately
+  setEditingJobData(prev => prev?.id === jobId ? { ...prev, status: newStatus } : prev);
+  
+  try {
+    await updateDoc(doc(db, 'users', currentUser.uid, 'jobs', jobId), {
+      status: newStatus,
+    });
+  } catch (error) {
+    console.error('Error updating job status:', error);
+    // Revert if there's an error
+    const revertedJobs = safeJobs.map(job => 
+      job.id === jobId ? { ...job, status: currentStatus } : job
+    );
+    // You'll need to handle the error state appropriately for your app
+  }
     setConfirmStatusChangeId(null);
   };
 
