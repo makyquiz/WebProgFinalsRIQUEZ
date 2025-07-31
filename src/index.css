@@ -36,7 +36,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: flex-start;
   background-color: #f3f4f6;
   padding-top: var(--nav-height);
@@ -77,7 +77,6 @@ button:focus-visible {
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
-  align-items: center;
 }
 
 .main-content {
@@ -90,43 +89,77 @@ button:focus-visible {
   padding-bottom: 4rem;
 }
 
-.section {
-  margin-bottom: 3rem;
-}
-
-.section-header {
-  margin-bottom: 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-  width: 100%;
-}
-
-.card {
-  background: white;
+/* Welcome Dashboard Styles */
+.dashboard-summary {
+  background-color: #f3f4f6;
+  padding: 2rem;
   border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-}
-
-.form-container {
-  max-width: 600px;
+  max-width: 100%;
+  margin: 2rem auto;
   width: 100%;
-  margin: 0 auto;
 }
 
+.dashboard-header {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.welcome-text {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.user-email {
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.metric-card {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-5px);
+}
+
+.metric-card h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.metric-card p {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #111827;
+}
+
+/* Accent color themes */
+.card-blue { border-left: 6px solid #3b82f6; }
+.card-green { border-left: 6px solid #10b981; }
+.card-yellow { border-left: 6px solid #f59e0b; }
+.card-purple { border-left: 6px solid #8b5cf6; }
+
+.loading-spinner {
+  text-align: center;
+  margin-top: 4rem;
+  font-size: 1.25rem;
+  color: #6b7280;
+}
+
+/* Responsive Adjustments */
 @media (max-width: 768px) {
   :root {
     --content-padding: 1rem;

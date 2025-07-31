@@ -5,19 +5,24 @@ import { useAuth } from '../context/AuthContext';
 import Notification from './Notification';
 import '../styles/JobForm.css';
 
+// Format date to "yyyy-MM-ddTHH:mm" for datetime-local input
+const formatDateTime = (date) => {
+  return new Date(date).toISOString().slice(0, 16);
+};
+
 const JobForm = () => {
   const { currentUser } = useAuth();
-  const today = new Date().toISOString().split('T')[0];
+  const now = formatDateTime(new Date());
 
   const [formData, setFormData] = useState({
-    date: today,
+    date: now.split('T')[0],
     client: '',
     title: '',
     amount: '',
     status: 'pending',
     notes: '',
-    startDate: today,
-    deadlineDate: today,
+    startDate: now,
+    deadlineDate: now,
   });
 
   const [notification, setNotification] = useState(null);
@@ -44,14 +49,14 @@ const JobForm = () => {
       });
 
       setFormData({
-        date: today,
+        date: now.split('T')[0],
         client: '',
         title: '',
         amount: '',
         status: 'pending',
         notes: '',
-        startDate: today,
-        deadlineDate: today,
+        startDate: now,
+        deadlineDate: now,
       });
 
     } catch (error) {
@@ -96,10 +101,10 @@ const JobForm = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="startDate">Start Date</label>
+          <label htmlFor="startDate">Start Date & Time</label>
           <input
             id="startDate"
-            type="date"
+            type="datetime-local"
             name="startDate"
             value={formData.startDate}
             onChange={handleChange}
@@ -108,10 +113,10 @@ const JobForm = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="deadlineDate">Deadline Date</label>
+          <label htmlFor="deadlineDate">Deadline Date & Time</label>
           <input
             id="deadlineDate"
-            type="date"
+            type="datetime-local"
             name="deadlineDate"
             value={formData.deadlineDate}
             onChange={handleChange}
