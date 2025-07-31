@@ -1,0 +1,26 @@
+.summary-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.summary-card {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--primary);
+}
+
+.summary-card h3 {
+  color: var(--gray);
+  font-size: var(--font-size-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.summary-card .amount,
+.summary-card .count {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--dark);
+}

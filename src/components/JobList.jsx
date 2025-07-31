@@ -1,37 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../context/AuthContext';
-import '../styles/JobList.css';
 
 const JobList = () => {
   const { jobs } = useOutletContext();
   const { currentUser } = useAuth();
-  const [filteredJobs, setFilteredJobs] = useState([]);
-  const [filters, setFilters] = useState({
-    month: '',
-    client: '',
-    status: ''
+  const [editingJob, setEditingJob] = useState(null);
+  const [sortOrder, setSortOrder] = useState('recent');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
+
+  // Handle cases where jobs might be undefined
+  const safeJobs = jobs || [];
+
+  // Sort jobs by date
+  const sortedJobs = [...safeJobs].sort((a, b) => {
+    const dateA = a.createdAt?.seconds || 0;
+    const dateB = b.createdAt?.seconds || 0;
+    return sortOrder === 'recent' ? dateB - dateA : dateA - dateB;
   });
 
-  useEffect(() => {
-    const filtered = jobs.filter(job => {
-      const jobDate = job.date;
-      const monthMatch = !filters.month || 
-        (jobDate && jobDate.getMonth() === parseInt(filters.month.split('-')[1]) - 1);
-      const clientMatch = !filters.client || 
-        job.client.toLowerCase().includes(filters.client.toLowerCase());
-      const statusMatch = !filters.status || job.status === filters.status;
-      return monthMatch && clientMatch && statusMatch;
-    });
-    setFilteredJobs(filtered);
-  }, [jobs, filters]);
+  const handleDelete = async (jobId) => {
+    try {
+      await deleteDoc(doc(db, 'users', currentUser.uid, 'jobs', jobId));
+    } catch (error) {
+      console.error("Error deleting job:", error);
+    }
+    setShowDeleteConfirm(null);
+  };
 
   const handleStatusToggle = async (jobId, currentStatus) => {
     try {
-      const jobRef = doc(db, 'users', currentUser.uid, 'jobs', jobId);
-      await updateDoc(jobRef, {
+      await updateDoc(doc(db, 'users', currentUser.uid, 'jobs', jobId), {
         status: currentStatus === 'paid' ? 'pending' : 'paid'
       });
     } catch (error) {
@@ -39,70 +40,86 @@ const JobList = () => {
     }
   };
 
-  if (jobs.length === 0) {
-    return (
-      <div className="empty-state">
-        <p>No jobs found. Add your first job!</p>
-      </div>
-    );
-  }
+  if (!currentUser) return <div>Please log in to view jobs</div>;
 
   return (
-    <div className="job-list-container" style={{ width: '100%' }}>
-      <div className="filters">
-        <div className="filter-group">
-          <label>Month:</label>
-          <input 
-            type="month" 
-            value={filters.month}
-            onChange={(e) => setFilters({...filters, month: e.target.value})}
-          />
-        </div>
-        <div className="filter-group">
-          <label>Client:</label>
-          <input 
-            type="text" 
-            placeholder="Filter by client"
-            value={filters.client}
-            onChange={(e) => setFilters({...filters, client: e.target.value})}
-          />
-        </div>
-        <div className="filter-group">
-          <label>Status:</label>
-          <select
-            value={filters.status}
-            onChange={(e) => setFilters({...filters, status: e.target.value})}
-          >
-            <option value="">All</option>
-            <option value="pending">Pending</option>
-            <option value="paid">Paid</option>
-          </select>
-        </div>
+    <div className="job-list-container">
+      <div className="list-controls">
+        <select 
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="sort-select"
+        >
+          <option value="recent">Recently Added</option>
+          <option value="oldest">Oldest First</option>
+        </select>
       </div>
 
-      <div className="jobs-grid">
-        {filteredJobs.map(job => (
-          <div key={job.id} className={`job-card ${job.status}`}>
-            <h3>{job.title || 'Untitled Job'}</h3>
-            <p><strong>Client:</strong> {job.client || 'No client specified'}</p>
-            <p><strong>Amount:</strong> ${job.amount?.toFixed(2)}</p>
-            <p><strong>Status:</strong> 
-              <span className={`status-badge ${job.status}`}>
-                {job.status}
-              </span>
-            </p>
-            {job.date && <p><strong>Date:</strong> {job.date.toLocaleDateString()}</p>}
-            {job.notes && <p><strong>Notes:</strong> {job.notes}</p>}
-            
-            <button
-              onClick={() => handleStatusToggle(job.id, job.status)}
-              className={`status-btn ${job.status}`}
-            >
-              {job.status === 'paid' ? 'Mark as Pending' : 'Mark as Paid'}
-            </button>
-          </div>
-        ))}
-      </div>
+      {sortedJobs.length === 0 ? (
+        <div className="empty-state">
+          <p>No jobs found. Add your first job!</p>
+        </div>
+      ) : (
+        <div className="jobs-grid">
+          {sortedJobs.map(job => (
+            <div key={job.id} className={`job-card ${job.status}`}>
+              <div className="job-header">
+                <h3>{job.title || 'Untitled Job'}</h3>
+                <div className="job-actions">
+                  <button 
+                    onClick={() => setEditingJob(job)}
+                    className="edit-btn"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteConfirm(job.id)}
+                    className="delete-btn"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+              
+              <p><strong>Client:</strong> {job.client || 'No client specified'}</p>
+              <p><strong>Amount:</strong> ${job.amount?.toFixed(2)}</p>
+              <p>
+                <strong>Status:</strong> 
+                <span className={`status-badge ${job.status}`}>
+                  {job.status}
+                </span>
+              </p>
+              
+              <button
+                onClick={() => handleStatusToggle(job.id, job.status)}
+                className={`status-btn ${job.status}`}
+              >
+                {job.status === 'paid' ? 'Mark as Pending' : 'Mark as Paid'}
+              </button>
+
+              {showDeleteConfirm === job.id && (
+                <div className="confirmation-dialog">
+                  <p>Delete this job permanently?</p>
+                  <div className="confirmation-buttons">
+                    <button 
+                      onClick={() => handleDelete(job.id)}
+                      className="confirm-delete"
+                    >
+                      Confirm
+                    </button>
+                    <button 
+                      onClick={() => setShowDeleteConfirm(null)}
+                      className="cancel-delete"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
