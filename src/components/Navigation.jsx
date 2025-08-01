@@ -10,7 +10,7 @@ const Navigation = () => {
   return (
     <nav className="navbar">
       <div className="nav-container">
-        <Link to="/" className="nav-brand">FreelancerIN</Link>
+        <Link to="/" className="nav-brand">FreelanceIN</Link>
         
         {currentUser && (
           <>
